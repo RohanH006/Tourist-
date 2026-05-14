@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nomad Atlas — Tourist Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+<style>
+/* ═══════════════════════════════════════════════════
+   NOMAD ATLAS — Design System
+   Aesthetic: Luxury Editorial Travel Magazine
+═══════════════════════════════════════════════════ */
+
+/* ── CSS Custom Properties ── */
+:root {
+  /* Brand */
+  --gold:        #c9a84c;
+  --gold-light:  #e8c97a;
+  --gold-dim:    rgba(201,168,76,0.18);
+  --gold-glow:   rgba(201,168,76,0.35);
+
+  /* Dark Theme */
+  --bg:          #0a0a0f;
+  --bg-2:        #10101a;
+  --bg-card:     #13131f;
+  --glass:       rgba(255,255,255,0.04);
+  --glass-b:     rgba(255,255,255,0.08);
+  --text:        #f0eee8;
+  --text-2:      #9e9a90;
+  --text-3:      #5a5750;
+  --border:      rgba(255,255,255,0.07);
+  --shadow:      rgba(0,0,0,0.7);
+  --danger:      #e05c5c;
+  --danger-dim:  rgba(224,92,92,0.15);
+  --success:     #5cb88a;
+  --success-dim: rgba(92,184,138,0.15);
+
+  /* Typography */
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'Outfit', system-ui, sans-serif;
+
+  /* Spacing & Shape */
+  --r:    14px;
+  --r-lg: 22px;
+  --r-xl: 32px;
+
+  /* Motion */
+  --ease:   cubic-bezier(0.4, 0, 0.2, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Light Theme */
+[data-theme="light"] {
+  --bg:       #f5f2eb;
+  --bg-2:     #ede9df;
+  --bg-card:  #ffffff;
+  --glass:    rgba(255,255,255,0.65);
+  --glass-b:  rgba(255,255,255,0.9);
+  --text:     #1a1814;
+  --text-2:   #5a5448;
+  --text-3:   #9a9288;
+  --border:   rgba(0,0,0,0.09);
+  --shadow:   rgba(0,0,0,0.12);
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  transition: background 0.4s var(--ease), color 0.4s var(--ease);
+  min-height: 100vh;
+}
+img    { display: block; max-width: 100%; }
+a      { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; background: none; font-family: var(--sans); }
+ul     { list-style: none; }
+input, textarea, select {
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--text);
+}
+input::placeholder, textarea::placeholder { color: var(--text-3); }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+
+/* ── Utility ── */
+.glass { background: var(--glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+.container { max-width: 1320px; margin: 0 auto; padding: 0 28px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+/* ────────────────────────────────────────────────
+   LOADER
+──────────────────────────────────────────────── */
+#loader {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 24px;
+  transition: opacity 0.6s var(--ease), visibility 0.6s var(--ease);
+}
+#loader.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.loader-logo {
+  font-family: var(--serif);
+  font-size: 42px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  color: var(--text);
+  animation: pulseText 1.6s ease-in-out infinite;
+}
+.loader-logo span { color: var(--gold); }
+
+.loader-ring {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--gold);
+  animation: spin 1s linear infinite;
+}
+.loader-track {
+  width: 220px; height: 2px;
+  background: var(--border); border-radius: 99px; overflow: hidden;
+}
+.loader-bar {
+  height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  border-radius: 99px;
+  animation: loadFill 2s var(--ease) forwards;
+}
+
+@keyframes spin      { to { transform: rotate(360deg); } }
+@keyframes pulseText { 0%,100%{opacity:1} 50%{opacity:0.5} }
+@keyframes loadFill  { 0%{width:0} 60%{width:75%} 100%{width:100%} }
+
+/* ────────────────────────────────────────────────
+   NAVBAR
+──────────────────────────────────────────────── */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+  height: 68px;
+  transition: background 0.4s var(--ease), border-color 0.4s var(--ease),
+              box-shadow 0.4s var(--ease);
+}
+.navbar.solid {
+  background: rgba(10,10,15,0.85);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 40px var(--shadow);
+  backdrop-filter: blur(20px);
+}
+[data-theme="light"] .navbar.solid {
+  background: rgba(245,242,235,0.88);
+}
+
+.nav-inner {
+  max-width: 1320px; margin: 0 auto; padding: 0 28px;
+  height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 20px;
+}
+
+.nav-brand {
+  font-family: var(--serif);
+  font-size: 24px; font-weight: 700; letter-spacing: 2px;
+  color: var(--text);
+  display: flex; align-items: center; gap: 8px;
+  white-space: nowrap;
+}
+.nav-brand-dot { color: var(--gold); }
+
+.nav-links {
+  display: flex; align-items: center; gap: 2px;
+}
+.nav-link {
+  padding: 7px 16px; border-radius: 99px;
+  font-size: 14px; font-weight: 500; color: var(--text-2);
+  transition: all 0.25s var(--ease);
+}
+.nav-link:hover, .nav-link.active {
+  color: var(--text);
+  background: var(--glass);
+}
+.nav-link.active { color: var(--gold); }
+
+.nav-actions { display: flex; align-items: center; gap: 10px; }
+
+/* Theme Toggle */
+.theme-btn {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--glass);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  transition: all 0.3s var(--ease);
+}
+.theme-btn:hover {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+  transform: rotate(20deg);
+}
+
+/* Add Destination CTA */
+.btn-add-nav {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 20px; border-radius: 99px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: #1a1400; font-weight: 600; font-size: 14px;
+  transition: all 0.3s var(--ease);
+  white-space: nowrap;
+}
+.btn-add-nav:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 28px var(--gold-glow);
+}
+
+/* Hamburger */
+.hamburger {
+  display: none; flex-direction: column;
+  gap: 5px; padding: 6px; border-radius: 8px;
+}
+.hamburger span {
+  display: block; width: 22px; height: 2px;
+  background: var(--text); border-radius: 99px;
+  transition: all 0.3s var(--ease);
+}
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile nav drawer */
+.mobile-nav {
+  display: none;
+  position: fixed; top: 68px; left: 0; right: 0; z-index: 850;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 28px 24px;
+  flex-direction: column; gap: 4px;
+  animation: slideDown 0.3s var(--ease);
+}
+.mobile-nav.open { display: flex; }
+.mobile-nav .nav-link { border-radius: var(--r); font-size: 15px; }
+@keyframes slideDown { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:none} }
+
+/* ────────────────────────────────────────────────
+   HERO
+──────────────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  padding: 130px 28px 80px;
+}
+
+.hero-canvas {
+  position: absolute; inset: 0;
+  background: var(--bg);
+  overflow: hidden;
+}
+/* Tilted stripe decoration */
+.hero-canvas::before {
+  content: '';
+  position: absolute;
+  top: -20%; left: -10%; right: 20%; bottom: 20%;
+  background: linear-gradient(140deg, rgba(201,168,76,0.06) 0%, transparent 60%);
+  transform: skewY(-6deg);
+}
+.hero-canvas::after {
+  content: '';
+  position: absolute;
+  top: 30%; right: -10%; bottom: -20%; left: 30%;
+  background: linear-gradient(320deg, rgba(60,100,200,0.07) 0%, transparent 60%);
+  transform: skewY(4deg);
+}
+
+/* Animated orbs */
+.orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(90px); pointer-events: none;
+  animation: orbDrift 12s ease-in-out infinite;
+}
+.orb-1 { width: 700px; height: 700px; background: rgba(201,168,76,0.12); top: -20%; left: -15%; animation-delay: 0s; }
+.orb-2 { width: 550px; height: 550px; background: rgba(80,130,255,0.09); bottom: -15%; right: -10%; animation-delay: -5s; }
+.orb-3 { width: 400px; height: 400px; background: rgba(201,168,76,0.07); top: 40%; right: 15%; animation-delay: -9s; }
+@keyframes orbDrift {
+  0%,100%{transform:translate(0,0) scale(1)}
+  33%    {transform:translate(40px,-30px) scale(1.08)}
+  66%    {transform:translate(-25px,40px) scale(0.94)}
+}
+
+/* Grid lines */
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 72px 72px;
+  opacity: 0.5;
+  mask-image: radial-gradient(ellipse 75% 75% at 50% 50%, black 20%, transparent 100%);
+}
+
+.hero-content {
+  position: relative; z-index: 2;
+  max-width: 760px; text-align: center;
+}
+
+.hero-kicker {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 20px; border-radius: 99px;
+  background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.3);
+  font-size: 12px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 32px;
+  animation: fadeUp 0.8s var(--ease) 0.3s both;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(52px, 9vw, 100px);
+  font-weight: 700; line-height: 0.95;
+  letter-spacing: -2px; color: var(--text);
+  margin-bottom: 28px;
+  animation: fadeUp 0.8s var(--ease) 0.5s both;
+}
+.hero-title em {
+  font-style: italic; color: var(--gold);
+  display: block;
+}
+
+.hero-sub {
+  font-size: 18px; color: var(--text-2); line-height: 1.75;
+  max-width: 560px; margin: 0 auto 48px;
+  animation: fadeUp 0.8s var(--ease) 0.7s both;
+}
+
+/* Hero search */
+.hero-search {
+  display: flex; gap: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 6px 6px 6px 24px;
+  max-width: 560px; margin: 0 auto 20px;
+  transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  animation: fadeUp 0.8s var(--ease) 0.9s both;
+}
+.hero-search:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-dim);
+}
+.hero-search input {
+  flex: 1; background: none; border: none; outline: none;
+  font-size: 15px; color: var(--text); min-width: 0;
+}
+.btn-search {
+  padding: 12px 28px; border-radius: 99px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: #1a1400; font-weight: 700; font-size: 14px;
+  transition: all 0.3s var(--ease); white-space: nowrap;
+}
+.btn-search:hover {
+  transform: scale(1.04);
+  box-shadow: 0 6px 24px var(--gold-glow);
+}
+
+.hero-chips {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  justify-content: center;
+  animation: fadeUp 0.8s var(--ease) 1.0s both;
+}
+.chip {
+  padding: 7px 16px; border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  font-size: 13px; color: var(--text-2);
+  cursor: pointer;
+  transition: all 0.25s var(--ease);
+}
+.chip:hover {
+  border-color: var(--gold); color: var(--gold);
+  background: var(--gold-dim);
+}
+
+/* Hero stats strip */
+.hero-stats {
+  position: absolute; bottom: 48px; left: 0; right: 0;
+  display: flex; justify-content: center; gap: 0;
+  z-index: 2;
+  animation: fadeUp 0.8s var(--ease) 1.2s both;
+}
+.h-stat {
+  padding: 0 40px; text-align: center;
+  border-right: 1px solid var(--border);
+}
+.h-stat:last-child { border-right: none; }
+.h-stat-num {
+  display: block;
+  font-family: var(--serif); font-size: 36px; font-weight: 700;
+  color: var(--gold); line-height: 1;
+}
+.h-stat-lbl {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-3);
+  margin-top: 4px;
+}
+
+/* Scroll cue */
+.scroll-cue {
+  position: absolute; bottom: 28px; right: 48px; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  color: var(--text-3); font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
+  animation: fadeIn 1s var(--ease) 1.5s both;
+}
+.scroll-cue::after {
+  content: '';
+  width: 1px; height: 48px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  animation: lineGrow 1.5s ease-in-out infinite;
+}
+@keyframes lineGrow { 0%,100%{opacity:0.4;height:30px} 50%{opacity:1;height:56px} }
+
+/* ────────────────────────────────────────────────
+   SECTIONS — Common
+──────────────────────────────────────────────── */
+.section { padding: 100px 0; }
+.section-alt { background: var(--bg-2); }
+
+.section-head { text-align: center; margin-bottom: 60px; }
+.section-eyebrow {
+  display: inline-block;
+  font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 14px;
+}
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(34px, 5vw, 56px);
+  font-weight: 700; line-height: 1.05;
+  color: var(--text);
+}
+.section-title em { font-style: italic; color: var(--gold); }
+.section-sub {
+  margin-top: 14px; font-size: 16px;
+  color: var(--text-2); max-width: 500px; margin-left: auto; margin-right: auto;
+}
+
+/* ────────────────────────────────────────────────
+   CATEGORIES STRIP
+──────────────────────────────────────────────── */
+.categories-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+.cat-tile {
+  position: relative; overflow: hidden;
+  padding: 36px 22px 28px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  text-align: center; cursor: pointer;
+  transition: all 0.4s var(--spring);
+  outline: none;
+}
+.cat-tile::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 100%, var(--cat-clr, var(--gold)) 0%, transparent 70%);
+  opacity: 0; transition: opacity 0.4s var(--ease);
+}
+.cat-tile:hover::before, .cat-tile.active::before { opacity: 0.12; }
+.cat-tile:hover, .cat-tile.active {
+  transform: translateY(-8px);
+  border-color: var(--cat-clr, var(--gold));
+  box-shadow: 0 20px 50px var(--shadow);
+}
+.cat-tile.active { border-color: var(--cat-clr, var(--gold)); }
+
+.cat-emoji { font-size: 46px; display: block; margin-bottom: 12px; transition: transform 0.4s var(--spring); }
+.cat-tile:hover .cat-emoji { transform: scale(1.25) rotate(-5deg); }
+
+.cat-name { font-family: var(--serif); font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.cat-count { font-size: 12px; color: var(--text-3); }
+
+/* ────────────────────────────────────────────────
+   TOOLBAR (search + filter + sort + add button)
+──────────────────────────────────────────────── */
+.toolbar {
+  display: flex; flex-wrap: wrap;
+  align-items: center; gap: 12px;
+  margin-bottom: 40px;
+}
+.toolbar-search {
+  flex: 1 1 260px;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 99px; padding: 10px 20px;
+  transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+.toolbar-search:focus-within {
+  border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim);
+}
+.toolbar-search input {
+  flex: 1; background: none; border: none; outline: none;
+  font-size: 14px; color: var(--text);
+}
+.search-ico { font-size: 16px; flex-shrink: 0; }
+
+.toolbar-select {
+  padding: 10px 18px; border-radius: 99px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  color: var(--text); font-size: 14px; cursor: pointer;
+  transition: border-color 0.3s var(--ease);
+  -webkit-appearance: none; appearance: none;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239e9a90' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+.toolbar-select:focus { outline: none; border-color: var(--gold); }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 24px; border-radius: 99px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: #1a1400; font-weight: 700; font-size: 14px;
+  transition: all 0.3s var(--ease); white-space: nowrap;
+}
+.btn-primary:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 28px var(--gold-glow);
+}
+
+.count-badge {
+  font-size: 14px; color: var(--text-2);
+  margin-left: auto; white-space: nowrap;
+}
+.count-badge strong { color: var(--gold); }
+
+/* ────────────────────────────────────────────────
+   DESTINATION CARDS GRID
+──────────────────────────────────────────────── */
+.destinations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 24px;
+}
+
+/* Empty state */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center; padding: 80px 20px;
+  color: var(--text-3);
+}
+.empty-state-icon { font-size: 64px; display: block; margin-bottom: 20px; opacity: 0.6; }
+.empty-state h3 { font-family: var(--serif); font-size: 28px; color: var(--text-2); margin-bottom: 10px; }
+.empty-state p  { font-size: 15px; }
+.empty-state .btn-primary { margin: 24px auto 0; }
+
+/* Destination Card */
+.dest-card {
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  transition: all 0.4s var(--spring);
+  animation: cardIn 0.5s var(--ease) both;
+  position: relative;
+}
+.dest-card:hover {
+  transform: translateY(-10px);
+  border-color: rgba(201,168,76,0.35);
+  box-shadow: 0 30px 60px var(--shadow), 0 0 0 1px rgba(201,168,76,0.1);
+}
+@keyframes cardIn { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:none} }
+
+.card-img-wrap {
+  position: relative; height: 226px; overflow: hidden; background: var(--bg-2);
+  flex-shrink: 0;
+}
+.card-img-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease);
+}
+.dest-card:hover .card-img-wrap img { transform: scale(1.08); }
+
+/* Fallback when no image */
+.card-img-wrap .img-fallback {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 64px; background: var(--bg-2);
+}
+
+.card-badge {
+  position: absolute; top: 14px; left: 14px;
+  padding: 5px 13px; border-radius: 99px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
+  font-size: 11px; font-weight: 600; letter-spacing: 1px;
+  text-transform: uppercase; color: white;
+}
+
+.card-actions-top {
+  position: absolute; top: 12px; right: 12px;
+  display: flex; gap: 8px;
+}
+.icon-btn {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; color: white;
+  transition: all 0.3s var(--ease); cursor: pointer;
+}
+.icon-btn:hover { transform: scale(1.15); }
+.fav-btn.active { background: rgba(224,92,92,0.6); border-color: rgba(224,92,92,0.5); }
+
+.card-body { padding: 22px 24px; flex: 1; display: flex; flex-direction: column; }
+
+.card-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.card-location {
+  font-size: 12px; color: var(--text-3);
+  display: flex; align-items: center; gap: 5px;
+}
+.card-rating {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 13px; color: var(--gold);
+  font-weight: 600;
+}
+
+.card-title {
+  font-family: var(--serif);
+  font-size: 22px; font-weight: 700; color: var(--text);
+  margin-bottom: 10px; line-height: 1.2;
+}
+.card-desc {
+  font-size: 14px; color: var(--text-2); line-height: 1.7;
+  margin-bottom: 18px; flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.card-footer {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.card-budget {
+  font-size: 13px; color: var(--text-3);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.card-budget strong { font-size: 17px; color: var(--gold); }
+.card-best-time {
+  font-size: 12px; color: var(--text-3);
+  display: flex; align-items: center; gap: 4px;
+}
+.btn-view {
+  padding: 8px 18px; border-radius: 99px;
+  border: 1px solid var(--gold); color: var(--gold);
+  font-size: 13px; font-weight: 600;
+  transition: all 0.3s var(--ease);
+}
+.btn-view:hover {
+  background: var(--gold); color: #1a1400;
+}
+
+/* ────────────────────────────────────────────────
+   FAVORITES SECTION
+──────────────────────────────────────────────── */
+#favSection { display: none; }
+#favSection.has-favs { display: block; }
+
+/* ────────────────────────────────────────────────
+   MODAL (shared: Add / Edit / View / Delete confirm)
+──────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1100;
+  background: rgba(5,5,10,0.82);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.35s var(--ease), visibility 0.35s var(--ease);
+}
+.modal-overlay.open {
+  opacity: 1; visibility: visible;
+}
+.modal-overlay.open .modal-box {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.modal-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  width: 100%; max-width: 660px;
+  max-height: 90vh; overflow-y: auto;
+  transform: translateY(28px) scale(0.97);
+  opacity: 0;
+  transition: all 0.4s var(--spring);
+  box-shadow: 0 40px 100px var(--shadow);
+}
+/* Scrollbar inside modal */
+.modal-box::-webkit-scrollbar { width: 4px; }
+.modal-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+.modal-header {
+  padding: 28px 32px 0;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+}
+.modal-title {
+  font-family: var(--serif);
+  font-size: 28px; font-weight: 700; color: var(--text);
+}
+.modal-close {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--glass); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: var(--text-2);
+  transition: all 0.25s var(--ease); flex-shrink: 0;
+}
+.modal-close:hover { background: var(--danger-dim); border-color: var(--danger); color: var(--danger); }
+
+/* ── Form inside modal ── */
+.modal-form { padding: 24px 32px 32px; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 7px; }
+.form-group.full { grid-column: 1 / -1; }
+.form-label {
+  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--text-3);
+}
+.form-input, .form-textarea, .form-select {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 12px 16px;
+  color: var(--text); font-size: 15px;
+  transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+  width: 100%;
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  outline: none; border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-dim);
+}
+.form-textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+.form-select {
+  cursor: pointer; -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239e9a90' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center;
+  padding-right: 40px;
+}
+[data-theme="light"] .form-input,
+[data-theme="light"] .form-textarea,
+[data-theme="light"] .form-select { background: var(--bg-2); }
+
+/* Image preview */
+.img-preview-wrap {
+  position: relative; border-radius: var(--r);
+  overflow: hidden; background: var(--bg-2);
+  border: 1px solid var(--border);
+  height: 160px; margin-top: 4px;
+  display: flex; align-items: center; justify-content: center;
+}
+.img-preview-wrap img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.img-preview-placeholder { color: var(--text-3); font-size: 13px; text-align: center; padding: 12px; }
+
+/* Rating stars in form */
+.star-picker { display: flex; gap: 6px; }
+.star-btn {
+  font-size: 24px; transition: transform 0.2s var(--spring);
+  cursor: pointer; line-height: 1;
+  filter: grayscale(1) opacity(0.4);
+}
+.star-btn.lit { filter: none; transform: scale(1.15); }
+
+/* Form actions */
+.form-actions {
+  display: flex; gap: 12px; justify-content: flex-end;
+  margin-top: 28px;
+}
+.btn-ghost {
+  padding: 11px 24px; border-radius: 99px;
+  border: 1px solid var(--border); background: none;
+  color: var(--text-2); font-size: 14px; font-weight: 500;
+  transition: all 0.25s var(--ease);
+}
+.btn-ghost:hover { border-color: var(--text-2); color: var(--text); }
+
+/* ── View / Detail modal ── */
+.view-modal .modal-box { max-width: 800px; }
+.view-img-wrap {
+  height: 320px; overflow: hidden; border-radius: var(--r-xl) var(--r-xl) 0 0;
+  background: var(--bg-2);
+  position: relative;
+}
+.view-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.view-img-wrap .img-fallback { font-size: 80px; }
+
+.view-body { padding: 32px; }
+.view-topbar {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 16px; margin-bottom: 20px;
+}
+.view-badge { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+.view-title { font-family: var(--serif); font-size: 38px; font-weight: 700; color: var(--text); line-height: 1.1; margin: 8px 0 6px; }
+.view-location { font-size: 14px; color: var(--text-3); display: flex; align-items: center; gap: 6px; }
+.view-rating-stars { font-size: 20px; color: var(--gold); }
+.view-desc { font-size: 16px; color: var(--text-2); line-height: 1.8; margin: 20px 0; }
+
+.view-info-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 14px; margin-top: 24px;
+}
+.info-chip {
+  padding: 16px 18px; border-radius: var(--r-lg);
+  background: var(--bg); border: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.info-chip-icon { font-size: 24px; }
+.info-chip-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-3); }
+.info-chip-val { font-size: 15px; font-weight: 600; color: var(--text); }
+
+.view-actions {
+  display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap;
+}
+.btn-edit {
+  padding: 11px 26px; border-radius: 99px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: #1a1400; font-weight: 700; font-size: 14px;
+  transition: all 0.3s var(--ease);
+}
+.btn-edit:hover { transform: scale(1.04); box-shadow: 0 8px 24px var(--gold-glow); }
+
+.btn-delete {
+  padding: 11px 26px; border-radius: 99px;
+  border: 1px solid var(--danger); color: var(--danger);
+  font-size: 14px; font-weight: 600;
+  transition: all 0.3s var(--ease);
+}
+.btn-delete:hover { background: var(--danger-dim); }
+
+/* ── Delete confirm modal ── */
+.confirm-modal .modal-box { max-width: 440px; }
+.confirm-body { padding: 32px; text-align: center; }
+.confirm-icon { font-size: 56px; display: block; margin-bottom: 16px; }
+.confirm-title { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.confirm-msg { font-size: 15px; color: var(--text-2); line-height: 1.6; }
+.confirm-actions { display: flex; gap: 12px; justify-content: center; margin-top: 28px; }
+
+.btn-danger {
+  padding: 12px 28px; border-radius: 99px;
+  background: var(--danger); color: white;
+  font-weight: 700; font-size: 14px;
+  transition: all 0.3s var(--ease);
+}
+.btn-danger:hover { transform: scale(1.04); box-shadow: 0 6px 20px rgba(224,92,92,0.4); }
+
+/* ────────────────────────────────────────────────
+   TOAST NOTIFICATION
+──────────────────────────────────────────────── */
+#toastContainer {
+  position: fixed; bottom: 32px; right: 32px; z-index: 9000;
+  display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
+}
+.toast {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 22px; border-radius: 14px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  box-shadow: 0 12px 40px var(--shadow);
+  font-size: 14px; font-weight: 500; color: var(--text);
+  max-width: 340px; white-space: nowrap;
+  animation: toastIn 0.4s var(--spring);
+  backdrop-filter: blur(16px);
+}
+.toast.success { border-color: rgba(92,184,138,0.4); }
+.toast.error   { border-color: rgba(224,92,92,0.4); }
+.toast-icon { font-size: 20px; flex-shrink: 0; }
+@keyframes toastIn { from{opacity:0;transform:translateX(40px) scale(0.9)} to{opacity:1;transform:none} }
+@keyframes toastOut { from{opacity:1} to{opacity:0;transform:translateX(50px) scale(0.9)} }
+
+/* ────────────────────────────────────────────────
+   FOOTER
+──────────────────────────────────────────────── */
+.footer {
+  padding: 70px 0 30px;
+  border-top: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+.footer-glow {
+  position: absolute; bottom: -60px; left: 50%; transform: translateX(-50%);
+  width: 600px; height: 200px;
+  background: radial-gradient(ellipse, var(--gold-dim) 0%, transparent 70%);
+  pointer-events: none;
+}
+.footer-inner {
+  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 40px; margin-bottom: 60px;
+}
+.footer-brand-name {
+  font-family: var(--serif); font-size: 26px; font-weight: 700;
+  color: var(--text); letter-spacing: 2px; margin-bottom: 14px;
+}
+.footer-brand-name span { color: var(--gold); }
+.footer-brand p { font-size: 14px; color: var(--text-3); line-height: 1.7; max-width: 220px; }
+
+.social-row { display: flex; gap: 10px; margin-top: 20px; }
+.social-icon {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--glass);
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+  transition: all 0.3s var(--ease);
+}
+.social-icon:hover { border-color: var(--gold); transform: translateY(-3px); }
+
+.footer-col h4 {
+  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 2px; color: var(--gold); margin-bottom: 18px;
+}
+.footer-col a {
+  display: block; font-size: 14px; color: var(--text-3);
+  margin-bottom: 12px; transition: color 0.25s var(--ease);
+}
+.footer-col a:hover { color: var(--text); }
+
+.footer-bottom {
+  padding-top: 28px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  font-size: 13px; color: var(--text-3);
+}
+
+/* ────────────────────────────────────────────────
+   ANIMATIONS
+──────────────────────────────────────────────── */
+@keyframes fadeUp  { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:none} }
+@keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+
+/* Reveal on scroll */
+.reveal {
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+}
+.reveal.visible { opacity: 1; transform: none; }
+
+/* ────────────────────────────────────────────────
+   RESPONSIVE
+──────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .categories-strip { grid-template-columns: repeat(3, 1fr); }
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+  .hero-floats { display: none; }
+}
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+  .hero-stats { gap: 0; }
+  .h-stat { padding: 0 20px; }
+  .h-stat-num { font-size: 26px; }
+  .view-info-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: 1; }
+}
+@media (max-width: 640px) {
+  .categories-strip { grid-template-columns: repeat(2, 1fr); }
+  .hero-stats { flex-wrap: wrap; }
+  .h-stat { padding: 8px 16px; border-right: none; border-bottom: 1px solid var(--border); }
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .count-badge { margin-left: 0; }
+  .destinations-grid { grid-template-columns: 1fr; }
+  .footer-inner { grid-template-columns: 1fr; }
+  .view-info-grid { grid-template-columns: 1fr; }
+  .modal-header { padding: 20px 20px 0; }
+  .modal-form, .view-body { padding: 20px; }
+  .confirm-body { padding: 24px 20px; }
+  .view-title { font-size: 28px; }
+  #toastContainer { bottom: 16px; right: 16px; }
+  .scroll-cue { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════ LOADER ════════════════ -->
+<div id="loader">
+  <div class="loader-logo">Nomad <span>Atlas</span></div>
+  <div class="loader-ring"></div>
+  <div class="loader-track"><div class="loader-bar"></div></div>
+</div>
+
+<!-- ════════════════ NAVBAR ════════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="#" class="nav-brand">Nomad<span class="nav-brand-dot">·</span>Atlas</a>
+
+    <ul class="nav-links">
+      <li><a href="#home"         class="nav-link active">Home</a></li>
+      <li><a href="#explore"      class="nav-link">Explore</a></li>
+      <li><a href="#destinations" class="nav-link">Destinations</a></li>
+      <li><a href="#favorites"    class="nav-link">Favorites</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="theme-btn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">☀️</button>
+      <button class="btn-add-nav" id="navAddBtn">＋ Add Place</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Nav -->
+<nav class="mobile-nav" id="mobileNav">
+  <a href="#home"         class="nav-link">Home</a>
+  <a href="#explore"      class="nav-link">Explore</a>
+  <a href="#destinations" class="nav-link">Destinations</a>
+  <a href="#favorites"    class="nav-link">Favorites</a>
+</nav>
+
+<!-- ════════════════ HERO ════════════════ -->
+<section class="hero" id="home">
+  <div class="hero-canvas">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="hero-grid"></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-kicker">✦ Your Personal Travel Companion</div>
+    <h1 class="hero-title">
+      Collect<br/>
+      <em>Extraordinary</em><br/>
+      Journeys
+    </h1>
+    <p class="hero-sub">
+      Curate, discover, and manage your dream destinations.
+      From secret beaches to ancient wonders — your atlas, your story.
+    </p>
+
+    <!-- Search -->
+    <div class="hero-search">
+      <input type="text" id="heroSearch" placeholder="Search destinations, countries…" autocomplete="off"/>
+      <button class="btn-search" id="heroSearchBtn">Explore →</button>
+    </div>
+    <div class="hero-chips">
+      <span class="chip" data-cat="beaches">🏖 Beaches</span>
+      <span class="chip" data-cat="mountains">🏔 Mountains</span>
+      <span class="chip" data-cat="historical">🏛 Historical</span>
+      <span class="chip" data-cat="adventure">🧗 Adventure</span>
+      <span class="chip" data-cat="religious">🕌 Religious</span>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="hero-stats" id="heroStats">
+    <div class="h-stat"><span class="h-stat-num" id="statTotal">0</span><div class="h-stat-lbl">Destinations</div></div>
+    <div class="h-stat"><span class="h-stat-num" id="statFavs">0</span><div class="h-stat-lbl">Favourites</div></div>
+    <div class="h-stat"><span class="h-stat-num" id="statCats">5</span><div class="h-stat-lbl">Categories</div></div>
+  </div>
+
+  <div class="scroll-cue">Scroll</div>
+</section>
+
+<!-- ════════════════ CATEGORIES ════════════════ -->
+<section class="section section-alt" id="explore">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-eyebrow">Browse by type</span>
+      <h2 class="section-title">Find Your <em>Perfect</em> Escape</h2>
+    </div>
+    <div class="categories-strip reveal">
+      <div class="cat-tile" data-cat="all"        style="--cat-clr:#c9a84c" tabindex="0">
+        <span class="cat-emoji">🌍</span>
+        <div class="cat-name">All Places</div>
+        <div class="cat-count" id="catAll">0 places</div>
+      </div>
+      <div class="cat-tile" data-cat="beaches"    style="--cat-clr:#0ea5e9" tabindex="0">
+        <span class="cat-emoji">🏖</span>
+        <div class="cat-name">Beaches</div>
+        <div class="cat-count" id="catBeaches">0 places</div>
+      </div>
+      <div class="cat-tile" data-cat="mountains"  style="--cat-clr:#22c55e" tabindex="0">
+        <span class="cat-emoji">🏔</span>
+        <div class="cat-name">Mountains</div>
+        <div class="cat-count" id="catMountains">0 places</div>
+      </div>
+      <div class="cat-tile" data-cat="historical" style="--cat-clr:#f59e0b" tabindex="0">
+        <span class="cat-emoji">🏛</span>
+        <div class="cat-name">Historical</div>
+        <div class="cat-count" id="catHistorical">0 places</div>
+      </div>
+      <div class="cat-tile" data-cat="adventure"  style="--cat-clr:#ef4444" tabindex="0">
+        <span class="cat-emoji">🧗</span>
+        <div class="cat-name">Adventure</div>
+        <div class="cat-count" id="catAdventure">0 places</div>
+      </div>
+      <div class="cat-tile" data-cat="religious"  style="--cat-clr:#8b5cf6" tabindex="0">
+        <span class="cat-emoji">🕌</span>
+        <div class="cat-name">Religious</div>
+        <div class="cat-count" id="catReligious">0 places</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ DESTINATIONS (Read + Filter) ════════════════ -->
+<section class="section" id="destinations">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-eyebrow">Your collection</span>
+      <h2 class="section-title">All <em>Destinations</em></h2>
+      <p class="section-sub">Add, edit, or remove places — your private travel atlas.</p>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar reveal">
+      <div class="toolbar-search">
+        <span class="search-ico">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search by name, city, country…" autocomplete="off"/>
+      </div>
+      <select class="toolbar-select" id="filterCat">
+        <option value="all">All Categories</option>
+        <option value="beaches">🏖 Beaches</option>
+        <option value="mountains">🏔 Mountains</option>
+        <option value="historical">🏛 Historical</option>
+        <option value="adventure">🧗 Adventure</option>
+        <option value="religious">🕌 Religious</option>
+      </select>
+      <select class="toolbar-select" id="sortBy">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="rating">Highest Rated</option>
+        <option value="name">Name A–Z</option>
+      </select>
+      <div class="count-badge" id="countBadge">Showing <strong>0</strong> places</div>
+      <button class="btn-primary" id="addBtn">＋ Add Destination</button>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="destinations-grid" id="destinationsGrid"></div>
+  </div>
+</section>
+
+<!-- ════════════════ FAVORITES ════════════════ -->
+<section class="section section-alt" id="favorites">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-eyebrow">❤ Saved places</span>
+      <h2 class="section-title">Your <em>Favourites</em></h2>
+    </div>
+    <div class="destinations-grid" id="favGrid"></div>
+  </div>
+</section>
+
+<!-- ════════════════ FOOTER ════════════════ -->
+<footer class="footer">
+  <div class="footer-glow"></div>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-brand-name">Nomad<span>·</span>Atlas</div>
+        <p>Your personal travel journal — curate, dream, and explore the world one destination at a time.</p>
+        <div class="social-row">
+          <a href="#" class="social-icon" title="Instagram">📸</a>
+          <a href="#" class="social-icon" title="Twitter">🐦</a>
+          <a href="#" class="social-icon" title="YouTube">▶️</a>
+          <a href="#" class="social-icon" title="Pinterest">📌</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <a href="#explore">Categories</a>
+        <a href="#destinations">Destinations</a>
+        <a href="#favorites">Favourites</a>
+      </div>
+      <div class="footer-col">
+        <h4>Categories</h4>
+        <a href="#">Beaches</a>
+        <a href="#">Mountains</a>
+        <a href="#">Historical</a>
+        <a href="#">Adventure</a>
+      </div>
+      <div class="footer-col">
+        <h4>App</h4>
+        <a href="#">About</a>
+        <a href="#">Privacy</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Nomad Atlas. Crafted for wanderers everywhere.</span>
+      <span>Built with HTML · CSS · JavaScript · LocalStorage</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════════ TOAST CONTAINER ════════════════ -->
+<div id="toastContainer"></div>
+
+<!-- ══════════════════════════════════════════════════
+   MODALS
+══════════════════════════════════════════════════ -->
+
+<!-- ── ADD / EDIT Modal ── -->
+<div class="modal-overlay" id="formModal" role="dialog" aria-modal="true" aria-labelledby="formModalTitle">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title" id="formModalTitle">Add Destination</h2>
+      <button class="modal-close" id="formModalClose" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-form">
+      <form id="destForm" novalidate>
+        <input type="hidden" id="editId"/>
+        <div class="form-grid">
+
+          <!-- Place Name -->
+          <div class="form-group full">
+            <label class="form-label" for="fName">Place Name *</label>
+            <input class="form-input" type="text" id="fName" placeholder="e.g. Santorini" required/>
+          </div>
+
+          <!-- Country -->
+          <div class="form-group">
+            <label class="form-label" for="fCountry">Country *</label>
+            <input class="form-input" type="text" id="fCountry" placeholder="e.g. Greece" required/>
+          </div>
+
+          <!-- City -->
+          <div class="form-group">
+            <label class="form-label" for="fCity">City / Region</label>
+            <input class="form-input" type="text" id="fCity" placeholder="e.g. Cyclades"/>
+          </div>
+
+          <!-- Category -->
+          <div class="form-group">
+            <label class="form-label" for="fCat">Category *</label>
+            <select class="form-select" id="fCat" required>
+              <option value="">Select category</option>
+              <option value="beaches">🏖 Beaches</option>
+              <option value="mountains">🏔 Mountains</option>
+              <option value="historical">🏛 Historical</option>
+              <option value="adventure">🧗 Adventure</option>
+              <option value="religious">🕌 Religious</option>
+            </select>
+          </div>
+
+          <!-- Rating -->
+          <div class="form-group">
+            <label class="form-label">Your Rating</label>
+            <div class="star-picker" id="starPicker">
+              <button type="button" class="star-btn" data-val="1">⭐</button>
+              <button type="button" class="star-btn" data-val="2">⭐</button>
+              <button type="button" class="star-btn" data-val="3">⭐</button>
+              <button type="button" class="star-btn" data-val="4">⭐</button>
+              <button type="button" class="star-btn" data-val="5">⭐</button>
+            </div>
+            <input type="hidden" id="fRating" value="0"/>
+          </div>
+
+          <!-- Description -->
+          <div class="form-group full">
+            <label class="form-label" for="fDesc">Description *</label>
+            <textarea class="form-textarea" id="fDesc" placeholder="Describe this place — what makes it special?" required></textarea>
+          </div>
+
+          <!-- Image URL -->
+          <div class="form-group full">
+            <label class="form-label" for="fImg">Image URL</label>
+            <input class="form-input" type="url" id="fImg" placeholder="https://images.unsplash.com/…"/>
+            <div class="img-preview-wrap" id="imgPreview">
+              <div class="img-preview-placeholder">🖼 Image preview will appear here</div>
+            </div>
+          </div>
+
+          <!-- Best Time -->
+          <div class="form-group">
+            <label class="form-label" for="fBestTime">Best Time to Visit</label>
+            <input class="form-input" type="text" id="fBestTime" placeholder="e.g. March – May"/>
+          </div>
+
+          <!-- Budget -->
+          <div class="form-group">
+            <label class="form-label" for="fBudget">Budget (per day)</label>
+            <input class="form-input" type="text" id="fBudget" placeholder="e.g. $80 – $150"/>
+          </div>
+
+          <!-- Weather -->
+          <div class="form-group">
+            <label class="form-label" for="fWeather">Weather / Climate</label>
+            <input class="form-input" type="text" id="fWeather" placeholder="e.g. Mediterranean, warm"/>
+          </div>
+
+          <!-- Tips -->
+          <div class="form-group">
+            <label class="form-label" for="fTips">Travel Tips</label>
+            <input class="form-input" type="text" id="fTips" placeholder="e.g. Book 3 months ahead"/>
+          </div>
+
+        </div><!-- /form-grid -->
+
+        <div class="form-actions">
+          <button type="button" class="btn-ghost" id="formCancelBtn">Cancel</button>
+          <button type="submit" class="btn-primary" id="formSubmitBtn">Save Destination</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── VIEW / Detail Modal ── -->
+<div class="modal-overlay view-modal" id="viewModal" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <button class="modal-close" id="viewModalClose" style="position:absolute;top:16px;right:16px;z-index:10" aria-label="Close">✕</button>
+    <div class="view-img-wrap" id="viewImg"></div>
+    <div class="view-body">
+      <div class="view-topbar">
+        <div>
+          <div class="view-badge" id="viewBadge"></div>
+          <h2 class="view-title" id="viewTitle"></h2>
+          <div class="view-location" id="viewLoc"></div>
+        </div>
+        <div class="view-rating-stars" id="viewStars"></div>
+      </div>
+      <p class="view-desc" id="viewDesc"></p>
+      <div class="view-info-grid">
+        <div class="info-chip"><span class="info-chip-icon">📅</span><div class="info-chip-label">Best Time</div><div class="info-chip-val" id="viewBestTime">—</div></div>
+        <div class="info-chip"><span class="info-chip-icon">💰</span><div class="info-chip-label">Daily Budget</div><div class="info-chip-val" id="viewBudget">—</div></div>
+        <div class="info-chip"><span class="info-chip-icon">🌤</span><div class="info-chip-label">Weather</div><div class="info-chip-val" id="viewWeather">—</div></div>
+        <div class="info-chip"><span class="info-chip-icon">✈️</span><div class="info-chip-label">Travel Tips</div><div class="info-chip-val" id="viewTips">—</div></div>
+        <div class="info-chip"><span class="info-chip-icon">📍</span><div class="info-chip-label">Location</div><div class="info-chip-val" id="viewCity">—</div></div>
+        <div class="info-chip"><span class="info-chip-icon">🗓</span><div class="info-chip-label">Added</div><div class="info-chip-val" id="viewDate">—</div></div>
+      </div>
+      <div class="view-actions">
+        <button class="btn-edit"   id="viewEditBtn">✏ Edit</button>
+        <button class="btn-delete" id="viewDeleteBtn">🗑 Delete</button>
+        <button class="btn-ghost"  id="viewFavBtn">♡ Favourite</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DELETE CONFIRM Modal ── -->
+<div class="modal-overlay confirm-modal" id="confirmModal" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <div class="confirm-body">
+      <span class="confirm-icon">🗑</span>
+      <h2 class="confirm-title">Delete Destination?</h2>
+      <p class="confirm-msg">This action cannot be undone. <strong id="confirmName"></strong> will be permanently removed from your atlas.</p>
+      <div class="confirm-actions">
+        <button class="btn-ghost"  id="confirmCancel">Keep It</button>
+        <button class="btn-danger" id="confirmDelete">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+   JAVASCRIPT — Full CRUD + LocalStorage + UI
+════════════════════════════════════════════════ -->
+<script>
+/* ═══════════════════════════════════════════
+   APP STATE & CONSTANTS
+═══════════════════════════════════════════ */
+const STORAGE_KEY  = 'nomadAtlas_destinations';
+const THEME_KEY    = 'nomadAtlas_theme';
+
+// Category metadata (emoji + label)
+const CAT_META = {
+  beaches:    { emoji: '🏖', label: 'Beaches' },
+  mountains:  { emoji: '🏔', label: 'Mountains' },
+  historical: { emoji: '🏛', label: 'Historical' },
+  adventure:  { emoji: '🧗', label: 'Adventure' },
+  religious:  { emoji: '🕌', label: 'Religious' },
+};
+
+// Seed data shown on first visit
+const SEED_DATA = [
+  {
+    id: 'seed1',
+    name: 'Santorini',
+    country: 'Greece',
+    city: 'Cyclades',
+    category: 'beaches',
+    description: 'Famous for its whitewashed clifftop buildings, iconic blue-domed churches, and spectacular sunsets over the caldera. A jewel of the Aegean Sea offering volcanic beaches and exquisite cuisine.',
+    image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&h=500&fit=crop',
+    bestTime: 'April – October',
+    budget: '$120 – $280/day',
+    weather: 'Mediterranean, sunny & warm',
+    tips: 'Book accommodation 6 months ahead for peak season',
+    rating: 5,
+    favourite: false,
+    createdAt: Date.now() - 86400000 * 5,
+  },
+  {
+    id: 'seed2',
+    name: 'Machu Picchu',
+    country: 'Peru',
+    city: 'Cusco Region',
+    category: 'historical',
+    description: 'The awe-inspiring Incan citadel set high in the Andes Mountains. A UNESCO World Heritage site shrouded in mist and mystery, offering breathtaking panoramas and a deep connection to ancient civilization.',
+    image: 'https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800&h=500&fit=crop',
+    bestTime: 'May – September',
+    budget: '$60 – $140/day',
+    weather: 'Temperate, misty mornings',
+    tips: 'Acclimatize in Cusco for 2 days first to avoid altitude sickness',
+    rating: 5,
+    favourite: true,
+    createdAt: Date.now() - 86400000 * 3,
+  },
+  {
+    id: 'seed3',
+    name: 'Banff National Park',
+    country: 'Canada',
+    city: 'Alberta',
+    category: 'mountains',
+    description: 'Canada\'s oldest national park, renowned for its stunning turquoise lakes, rugged mountain peaks, and abundant wildlife. A paradise for hikers, skiers, and nature lovers year-round.',
+    image: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&h=500&fit=crop',
+    bestTime: 'June – August, Dec – Feb',
+    budget: '$90 – $200/day',
+    weather: 'Alpine, cold winters & mild summers',
+    tips: 'Visit Lake Louise at sunrise to avoid crowds',
+    rating: 4,
+    favourite: false,
+    createdAt: Date.now() - 86400000 * 1,
+  },
+  {
+    id: 'seed4',
+    name: 'Varanasi',
+    country: 'India',
+    city: 'Uttar Pradesh',
+    category: 'religious',
+    description: 'One of the world\'s oldest living cities, considered the spiritual capital of India. The sacred ghats along the Ganges River witness ancient Hindu rituals, cremation ceremonies, and a deeply moving spiritual atmosphere.',
+    image: 'https://images.unsplash.com/photo-1561361058-c24cecae35ca?w=800&h=500&fit=crop',
+    bestTime: 'October – March',
+    budget: '$20 – $60/day',
+    weather: 'Hot & humid, cool winters',
+    tips: 'Attend the Ganga Aarti ceremony at Dashashwamedh Ghat at dusk',
+    rating: 4,
+    favourite: false,
+    createdAt: Date.now() - 86400000 * 2,
+  },
+  {
+    id: 'seed5',
+    name: 'Queenstown',
+    country: 'New Zealand',
+    city: 'Otago',
+    category: 'adventure',
+    description: 'The adventure capital of the world, nestled beside a pristine lake with the Remarkables mountain range as a backdrop. Bungee jumping, skydiving, jet-boating — the thrill never stops.',
+    image: 'https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=800&h=500&fit=crop',
+    bestTime: 'December – February',
+    budget: '$100 – $220/day',
+    weather: 'Mild, four distinct seasons',
+    tips: 'AJ Hackett bungee is a must — book online for discounts',
+    rating: 5,
+    favourite: true,
+    createdAt: Date.now(),
+  },
+];
+
+/* ═══════════════════════════════════════════
+   DATA LAYER — LocalStorage CRUD
+═══════════════════════════════════════════ */
+
+/** Load destinations from LocalStorage; seed if empty */
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* corrupted data */ }
+  // First visit: save & return seed
+  saveData(SEED_DATA);
+  return SEED_DATA;
+}
+
+/** Persist destinations array to LocalStorage */
+function saveData(arr) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+}
+
+/** Generate a simple unique ID */
+function uid() {
+  return 'dest_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+}
+
+/* ═══════════════════════════════════════════
+   APP STATE
+═══════════════════════════════════════════ */
+let destinations = loadData();
+let filterCat    = 'all';
+let filterSearch = '';
+let sortMode     = 'newest';
+let currentRating = 0;         // star picker state
+let pendingDeleteId = null;    // for confirm modal
+let currentViewId   = null;    // for view modal
+
+/* ═══════════════════════════════════════════
+   THEME
+═══════════════════════════════════════════ */
+(function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY) || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  updateThemeBtn(saved);
+})();
+
+function updateThemeBtn(theme) {
+  document.getElementById('themeBtn').textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur  = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem(THEME_KEY, next);
+  updateThemeBtn(next);
+});
+
+/* ═══════════════════════════════════════════
+   NAVBAR — scroll + hamburger
+═══════════════════════════════════════════ */
+const navbar     = document.getElementById('navbar');
+const hamburger  = document.getElementById('hamburger');
+const mobileNav  = document.getElementById('mobileNav');
+
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('solid', window.scrollY > 30);
+  updateActiveNavLink();
+});
+
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  mobileNav.classList.toggle('open');
+});
+
+// Close mobile nav when a link is clicked
+mobileNav.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', () => {
+    hamburger.classList.remove('open');
+    mobileNav.classList.remove('open');
+  });
+});
+
+function updateActiveNavLink() {
+  const sections = ['home','explore','destinations','favorites'];
+  const active   = sections.find(id => {
+    const el = document.getElementById(id);
+    if (!el) return false;
+    const rect = el.getBoundingClientRect();
+    return rect.top <= 100 && rect.bottom > 100;
+  });
+  document.querySelectorAll('.nav-link').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + active);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   LOADER
+═══════════════════════════════════════════ */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('gone');
+    renderAll();
+    initScrollReveal();
+  }, 2000);
+});
+
+/* ═══════════════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════════════ */
+function initScrollReveal() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
+
+/* ═══════════════════════════════════════════
+   HERO — search + chips
+═══════════════════════════════════════════ */
+document.getElementById('heroSearchBtn').addEventListener('click', () => {
+  const val = document.getElementById('heroSearch').value.trim();
+  if (val) {
+    filterSearch = val;
+    document.getElementById('searchInput').value = val;
+    document.getElementById('destinations').scrollIntoView({ behavior: 'smooth' });
+    renderGrid();
+  }
+});
+document.getElementById('heroSearch').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('heroSearchBtn').click();
+});
+
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    filterCat = chip.dataset.cat;
+    document.getElementById('filterCat').value = filterCat;
+    document.getElementById('destinations').scrollIntoView({ behavior: 'smooth' });
+    updateCatTiles();
+    renderGrid();
+  });
+});
+
+/* ═══════════════════════════════════════════
+   CATEGORY TILES
+═══════════════════════════════════════════ */
+document.querySelectorAll('.cat-tile').forEach(tile => {
+  tile.addEventListener('click', () => {
+    filterCat = tile.dataset.cat;
+    document.getElementById('filterCat').value = filterCat;
+    updateCatTiles();
+    renderGrid();
+    document.getElementById('destinations').scrollIntoView({ behavior: 'smooth' });
+  });
+  tile.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') tile.click(); });
+});
+
+function updateCatTiles() {
+  document.querySelectorAll('.cat-tile').forEach(t => {
+    t.classList.toggle('active', t.dataset.cat === filterCat);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   TOOLBAR — search, filter, sort
+═══════════════════════════════════════════ */
+document.getElementById('searchInput').addEventListener('input', e => {
+  filterSearch = e.target.value.trim().toLowerCase();
+  renderGrid();
+});
+document.getElementById('filterCat').addEventListener('change', e => {
+  filterCat = e.target.value;
+  updateCatTiles();
+  renderGrid();
+});
+document.getElementById('sortBy').addEventListener('change', e => {
+  sortMode = e.target.value;
+  renderGrid();
+});
+
+/* ═══════════════════════════════════════════
+   ADD / EDIT BUTTONS
+═══════════════════════════════════════════ */
+document.getElementById('addBtn').addEventListener('click',    () => openFormModal());
+document.getElementById('navAddBtn').addEventListener('click', () => openFormModal());
+
+/* ═══════════════════════════════════════════
+   STAR PICKER
+═══════════════════════════════════════════ */
+document.querySelectorAll('.star-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentRating = parseInt(btn.dataset.val);
+    document.getElementById('fRating').value = currentRating;
+    updateStarUI(currentRating);
+  });
+  btn.addEventListener('mouseenter', () => updateStarUI(parseInt(btn.dataset.val)));
+  btn.addEventListener('mouseleave', () => updateStarUI(currentRating));
+});
+
+function updateStarUI(val) {
+  document.querySelectorAll('.star-btn').forEach(b => {
+    b.classList.toggle('lit', parseInt(b.dataset.val) <= val);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   IMAGE PREVIEW
+═══════════════════════════════════════════ */
+document.getElementById('fImg').addEventListener('input', e => {
+  renderImgPreview(e.target.value.trim());
+});
+
+function renderImgPreview(url) {
+  const wrap = document.getElementById('imgPreview');
+  if (!url) {
+    wrap.innerHTML = '<div class="img-preview-placeholder">🖼 Image preview will appear here</div>';
+    return;
+  }
+  const img = new Image();
+  img.onload = () => { wrap.innerHTML = ''; wrap.appendChild(img); img.style.cssText='width:100%;height:100%;object-fit:cover'; };
+  img.onerror = () => { wrap.innerHTML = '<div class="img-preview-placeholder">⚠️ Could not load image</div>'; };
+  img.src = url;
+  img.alt = 'Preview';
+}
+
+/* ═══════════════════════════════════════════
+   FORM MODAL — open / close / submit
+═══════════════════════════════════════════ */
+function openFormModal(destId = null) {
+  const modal = document.getElementById('formModal');
+  const form  = document.getElementById('destForm');
+  form.reset();
+  currentRating = 0;
+  updateStarUI(0);
+  renderImgPreview('');
+  document.getElementById('editId').value = '';
+
+  if (destId) {
+    // ── EDIT mode ──
+    const dest = destinations.find(d => d.id === destId);
+    if (!dest) return;
+    document.getElementById('formModalTitle').textContent = 'Edit Destination';
+    document.getElementById('formSubmitBtn').textContent  = 'Update Destination';
+    document.getElementById('editId').value  = dest.id;
+    document.getElementById('fName').value   = dest.name;
+    document.getElementById('fCountry').value = dest.country;
+    document.getElementById('fCity').value   = dest.city || '';
+    document.getElementById('fCat').value    = dest.category;
+    document.getElementById('fDesc').value   = dest.description;
+    document.getElementById('fImg').value    = dest.image || '';
+    document.getElementById('fBestTime').value = dest.bestTime || '';
+    document.getElementById('fBudget').value = dest.budget || '';
+    document.getElementById('fWeather').value = dest.weather || '';
+    document.getElementById('fTips').value   = dest.tips || '';
+    currentRating = dest.rating || 0;
+    document.getElementById('fRating').value = currentRating;
+    updateStarUI(currentRating);
+    renderImgPreview(dest.image || '');
+  } else {
+    document.getElementById('formModalTitle').textContent = 'Add Destination';
+    document.getElementById('formSubmitBtn').textContent  = 'Save Destination';
+  }
+
+  openModal('formModal');
+}
+
+function closeFormModal() { closeModal('formModal'); }
+
+document.getElementById('formModalClose').addEventListener('click',  closeFormModal);
+document.getElementById('formCancelBtn').addEventListener('click',   closeFormModal);
+
+// FORM SUBMIT — Create or Update
+document.getElementById('destForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = document.getElementById('fName').value.trim();
+  const country = document.getElementById('fCountry').value.trim();
+  const cat  = document.getElementById('fCat').value;
+  const desc = document.getElementById('fDesc').value.trim();
+
+  if (!name || !country || !cat || !desc) {
+    showToast('⚠️ Please fill in all required fields', 'error');
+    return;
+  }
+
+  const editId = document.getElementById('editId').value;
+  const payload = {
+    name,
+    country,
+    city:     document.getElementById('fCity').value.trim(),
+    category: cat,
+    description: desc,
+    image:    document.getElementById('fImg').value.trim(),
+    bestTime: document.getElementById('fBestTime').value.trim(),
+    budget:   document.getElementById('fBudget').value.trim(),
+    weather:  document.getElementById('fWeather').value.trim(),
+    tips:     document.getElementById('fTips').value.trim(),
+    rating:   parseInt(document.getElementById('fRating').value) || 0,
+  };
+
+  if (editId) {
+    // ── UPDATE ──
+    const idx = destinations.findIndex(d => d.id === editId);
+    if (idx !== -1) {
+      destinations[idx] = { ...destinations[idx], ...payload };
+      saveData(destinations);
+      showToast('✅ Destination updated!', 'success');
+      // Refresh view modal if open
+      if (currentViewId === editId) openViewModal(editId);
+    }
+  } else {
+    // ── CREATE ──
+    const newDest = { id: uid(), ...payload, favourite: false, createdAt: Date.now() };
+    destinations.unshift(newDest);
+    saveData(destinations);
+    showToast('🎉 Destination added!', 'success');
+  }
+
+  closeFormModal();
+  renderAll();
+});
+
+/* ═══════════════════════════════════════════
+   VIEW / DETAIL MODAL
+═══════════════════════════════════════════ */
+function openViewModal(destId) {
+  const dest = destinations.find(d => d.id === destId);
+  if (!dest) return;
+  currentViewId = destId;
+
+  const catMeta = CAT_META[dest.category] || { emoji: '📍', label: dest.category };
+  const stars   = '⭐'.repeat(dest.rating || 0);
+  const dateStr = new Date(dest.createdAt).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+
+  // Image
+  const imgWrap = document.getElementById('viewImg');
+  if (dest.image) {
+    imgWrap.innerHTML = `<img src="${escHtml(dest.image)}" alt="${escHtml(dest.name)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'img-fallback\\'>${catMeta.emoji}</div>'"/>`;
+  } else {
+    imgWrap.innerHTML = `<div class="img-fallback" style="height:100%;display:flex;align-items:center;justify-content:center;font-size:80px">${catMeta.emoji}</div>`;
+  }
+
+  document.getElementById('viewBadge').textContent    = `${catMeta.emoji} ${catMeta.label}`;
+  document.getElementById('viewTitle').textContent    = dest.name;
+  document.getElementById('viewLoc').innerHTML        = `📍 ${escHtml(dest.city ? dest.city + ', ' : '')}${escHtml(dest.country)}`;
+  document.getElementById('viewStars').textContent    = stars || '—';
+  document.getElementById('viewDesc').textContent     = dest.description;
+  document.getElementById('viewBestTime').textContent = dest.bestTime || '—';
+  document.getElementById('viewBudget').textContent   = dest.budget   || '—';
+  document.getElementById('viewWeather').textContent  = dest.weather  || '—';
+  document.getElementById('viewTips').textContent     = dest.tips     || '—';
+  document.getElementById('viewCity').textContent     = (dest.city ? dest.city + ', ' : '') + dest.country;
+  document.getElementById('viewDate').textContent     = dateStr;
+
+  // Fav button
+  const favBtn = document.getElementById('viewFavBtn');
+  favBtn.textContent = dest.favourite ? '❤ Unfavourite' : '♡ Favourite';
+
+  openModal('viewModal');
+}
+
+document.getElementById('viewModalClose').addEventListener('click', () => closeModal('viewModal'));
+
+document.getElementById('viewEditBtn').addEventListener('click', () => {
+  closeModal('viewModal');
+  setTimeout(() => openFormModal(currentViewId), 200);
+});
+
+document.getElementById('viewDeleteBtn').addEventListener('click', () => {
+  closeModal('viewModal');
+  setTimeout(() => openConfirmModal(currentViewId), 200);
+});
+
+document.getElementById('viewFavBtn').addEventListener('click', () => {
+  toggleFav(currentViewId);
+  // Update button text without closing
+  const dest   = destinations.find(d => d.id === currentViewId);
+  document.getElementById('viewFavBtn').textContent = dest.favourite ? '❤ Unfavourite' : '♡ Favourite';
+  renderGrid();
+  renderFavGrid();
+  updateStats();
+});
+
+/* ═══════════════════════════════════════════
+   DELETE CONFIRM MODAL
+═══════════════════════════════════════════ */
+function openConfirmModal(destId) {
+  const dest = destinations.find(d => d.id === destId);
+  if (!dest) return;
+  pendingDeleteId = destId;
+  document.getElementById('confirmName').textContent = dest.name;
+  openModal('confirmModal');
+}
+
+document.getElementById('confirmCancel').addEventListener('click',  () => closeModal('confirmModal'));
+document.getElementById('confirmDelete').addEventListener('click',  () => {
+  if (!pendingDeleteId) return;
+  deleteDestination(pendingDeleteId);
+  closeModal('confirmModal');
+});
+
+function deleteDestination(id) {
+  const dest = destinations.find(d => d.id === id);
+  destinations = destinations.filter(d => d.id !== id);
+  saveData(destinations);
+  renderAll();
+  showToast(`🗑 "${dest.name}" removed`, 'error');
+  pendingDeleteId = null;
+}
+
+/* ═══════════════════════════════════════════
+   FAVOURITES
+═══════════════════════════════════════════ */
+function toggleFav(id) {
+  const idx = destinations.findIndex(d => d.id === id);
+  if (idx === -1) return;
+  destinations[idx].favourite = !destinations[idx].favourite;
+  saveData(destinations);
+  const msg = destinations[idx].favourite
+    ? `❤ Added "${destinations[idx].name}" to favourites`
+    : `💔 Removed "${destinations[idx].name}" from favourites`;
+  showToast(msg, destinations[idx].favourite ? 'success' : '');
+  renderGrid();
+  renderFavGrid();
+  updateStats();
+}
+
+/* ═══════════════════════════════════════════
+   MODAL HELPERS
+═══════════════════════════════════════════ */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Close on overlay click
+['formModal', 'viewModal', 'confirmModal'].forEach(id => {
+  document.getElementById(id).addEventListener('click', e => {
+    if (e.target === document.getElementById(id)) closeModal(id);
+  });
+});
+
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    ['formModal', 'viewModal', 'confirmModal'].forEach(id => {
+      if (document.getElementById(id).classList.contains('open')) closeModal(id);
+    });
+  }
+});
+
+/* ═══════════════════════════════════════════
+   RENDER — Grid of destination cards
+═══════════════════════════════════════════ */
+function getFilteredSorted() {
+  let arr = [...destinations];
+
+  // Filter by category
+  if (filterCat !== 'all') arr = arr.filter(d => d.category === filterCat);
+
+  // Filter by search
+  if (filterSearch) {
+    const q = filterSearch.toLowerCase();
+    arr = arr.filter(d =>
+      d.name.toLowerCase().includes(q) ||
+      d.country.toLowerCase().includes(q) ||
+      (d.city && d.city.toLowerCase().includes(q)) ||
+      d.description.toLowerCase().includes(q)
+    );
+  }
+
+  // Sort
+  switch (sortMode) {
+    case 'oldest': arr.sort((a,b) => a.createdAt - b.createdAt); break;
+    case 'rating': arr.sort((a,b) => (b.rating||0) - (a.rating||0)); break;
+    case 'name':   arr.sort((a,b) => a.name.localeCompare(b.name)); break;
+    default:       arr.sort((a,b) => b.createdAt - a.createdAt); // newest
+  }
+
+  return arr;
+}
+
+function renderGrid() {
+  const arr  = getFilteredSorted();
+  const grid = document.getElementById('destinationsGrid');
+  document.getElementById('countBadge').innerHTML = `Showing <strong>${arr.length}</strong> place${arr.length !== 1 ? 's' : ''}`;
+
+  if (arr.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <span class="empty-state-icon">🗺</span>
+        <h3>${filterSearch || filterCat !== 'all' ? 'No results found' : 'Your atlas is empty'}</h3>
+        <p>${filterSearch || filterCat !== 'all' ? 'Try adjusting your search or filters.' : 'Start adding amazing destinations!'}</p>
+        ${filterSearch || filterCat !== 'all' ? '' : `<button class="btn-primary" onclick="openFormModal()">＋ Add Your First Destination</button>`}
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = arr.map((d, i) => buildCard(d, i)).join('');
+
+  // Attach card events
+  grid.querySelectorAll('.btn-view').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); openViewModal(btn.dataset.id); });
+  });
+  grid.querySelectorAll('.fav-btn').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); toggleFav(btn.dataset.id); });
+  });
+  grid.querySelectorAll('.edit-btn-card').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); openFormModal(btn.dataset.id); });
+  });
+  grid.querySelectorAll('.del-btn-card').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); openConfirmModal(btn.dataset.id); });
+  });
+  // Click card body → view
+  grid.querySelectorAll('.dest-card').forEach(card => {
+    card.addEventListener('click', () => openViewModal(card.dataset.id));
+  });
+}
+
+function buildCard(d, i) {
+  const catMeta = CAT_META[d.category] || { emoji: '📍', label: d.category };
+  const stars   = d.rating ? '⭐'.repeat(d.rating) : '—';
+  const imgHtml = d.image
+    ? `<img src="${escHtml(d.image)}" alt="${escHtml(d.name)}" loading="lazy"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"  />
+       <div class="img-fallback" style="display:none;height:100%;align-items:center;justify-content:center;font-size:64px">${catMeta.emoji}</div>`
+    : `<div class="img-fallback" style="height:100%;display:flex;align-items:center;justify-content:center;font-size:64px">${catMeta.emoji}</div>`;
+
+  return `
+    <article class="dest-card" data-id="${d.id}" style="animation-delay:${i * 0.06}s" tabindex="0" role="button" aria-label="${escHtml(d.name)}">
+      <div class="card-img-wrap">
+        ${imgHtml}
+        <div class="card-badge">${catMeta.emoji} ${catMeta.label}</div>
+        <div class="card-actions-top">
+          <button class="icon-btn fav-btn ${d.favourite ? 'active' : ''}" data-id="${d.id}" title="${d.favourite ? 'Unfavourite' : 'Favourite'}" aria-label="${d.favourite ? 'Remove from favourites' : 'Add to favourites'}">
+            ${d.favourite ? '❤' : '♡'}
+          </button>
+          <button class="icon-btn edit-btn-card" data-id="${d.id}" title="Edit" aria-label="Edit">✏</button>
+          <button class="icon-btn del-btn-card"  data-id="${d.id}" title="Delete" aria-label="Delete">🗑</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-meta">
+          <div class="card-location">📍 ${escHtml(d.city ? d.city + ', ' : '')}${escHtml(d.country)}</div>
+          <div class="card-rating">${stars}</div>
+        </div>
+        <h3 class="card-title">${escHtml(d.name)}</h3>
+        <p class="card-desc">${escHtml(d.description)}</p>
+        <div class="card-footer">
+          <div class="card-budget">
+            <span>Daily budget</span>
+            <strong>${escHtml(d.budget || 'N/A')}</strong>
+          </div>
+          <button class="btn-view" data-id="${d.id}">View →</button>
+        </div>
+      </div>
+    </article>`;
+}
+
+/* ═══════════════════════════════════════════
+   RENDER — Favourites Grid
+═══════════════════════════════════════════ */
+function renderFavGrid() {
+  const favs = destinations.filter(d => d.favourite);
+  const grid  = document.getElementById('favGrid');
+  const sec   = document.getElementById('favorites');
+
+  if (favs.length === 0) {
+    sec.style.display = 'none';
+    grid.innerHTML = '';
+    return;
+  }
+  sec.style.display = 'block';
+  grid.innerHTML = favs.map((d, i) => buildCard(d, i)).join('');
+
+  // Attach events (same as main grid)
+  grid.querySelectorAll('.btn-view').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); openViewModal(btn.dataset.id); });
+  });
+  grid.querySelectorAll('.fav-btn').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); toggleFav(btn.dataset.id); });
+  });
+  grid.querySelectorAll('.edit-btn-card').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); openFormModal(btn.dataset.id); });
+  });
+  grid.querySelectorAll('.del-btn-card').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); openConfirmModal(btn.dataset.id); });
+  });
+  grid.querySelectorAll('.dest-card').forEach(card => {
+    card.addEventListener('click', () => openViewModal(card.dataset.id));
+  });
+}
+
+/* ═══════════════════════════════════════════
+   CATEGORY COUNTS
+═══════════════════════════════════════════ */
+function updateCatCounts() {
+  const total = destinations.length;
+  document.getElementById('catAll').textContent       = `${total} place${total!==1?'s':''}`;
+  ['beaches','mountains','historical','adventure','religious'].forEach(cat => {
+    const n = destinations.filter(d => d.category === cat).length;
+    const el = document.getElementById('cat' + cat.charAt(0).toUpperCase() + cat.slice(1));
+    if (el) el.textContent = `${n} place${n!==1?'s':''}`;
+  });
+}
+
+/* ═══════════════════════════════════════════
+   HERO STATS
+═══════════════════════════════════════════ */
+function updateStats() {
+  document.getElementById('statTotal').textContent = destinations.length;
+  document.getElementById('statFavs').textContent  = destinations.filter(d => d.favourite).length;
+}
+
+/* ═══════════════════════════════════════════
+   RENDER ALL
+═══════════════════════════════════════════ */
+function renderAll() {
+  renderGrid();
+  renderFavGrid();
+  updateCatCounts();
+  updateStats();
+}
+
+/* ═══════════════════════════════════════════
+   TOAST NOTIFICATION
+═══════════════════════════════════════════ */
+function showToast(msg, type = '') {
+  const container = document.getElementById('toastContainer');
+  const toast     = document.createElement('div');
+  toast.className = `toast ${type}`;
+
+  const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+  toast.innerHTML = `<span class="toast-icon">${icon}</span><span>${msg}</span>`;
+
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.animation = 'toastOut 0.4s ease forwards';
+    setTimeout(() => toast.remove(), 400);
+  }, 3200);
+}
+
+/* ═══════════════════════════════════════════
+   UTILITY — escape HTML to prevent XSS
+═══════════════════════════════════════════ */
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/* ── Initial active cat tile ── */
+document.querySelector('.cat-tile[data-cat="all"]').classList.add('active');
+</script>
+</body>
+</html>
